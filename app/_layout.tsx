@@ -329,126 +329,126 @@ import { router } from 'expo-router';
 import { notificationStore } from '@/utils/NotificationStore';
 
 // Enhanced notification routing with store
-const handleNotificationRouting = async (remoteMessage: any) => {
-  console.log('=== ENHANCED NOTIFICATION ROUTING ===');
-  console.log('Message:', JSON.stringify(remoteMessage, null, 2));
+// const handleNotificationRouting = async (remoteMessage: any) => {
+//   console.log('=== ENHANCED NOTIFICATION ROUTING ===');
+//   console.log('Message:', JSON.stringify(remoteMessage, null, 2));
   
-  if (!remoteMessage?.data) {
-    console.log('No notification data, navigating to home');
-    router.replace('/(tabs)/home');
-    return;
-  }
+//   if (!remoteMessage?.data) {
+//     console.log('No notification data, navigating to home');
+//     router.replace('/(tabs)/home');
+//     return;
+//   }
 
-  // Store the notification data for complex routing
-  await notificationStore.setPendingNavigation(remoteMessage.data);
+//   // Store the notification data for complex routing
+//   await notificationStore.setPendingNavigation(remoteMessage.data);
   
-  // Navigate to the appropriate tab - specific routing will be handled by individual screens
-  const { route, room_id, service_id } = remoteMessage.data;
+//   // Navigate to the appropriate tab - specific routing will be handled by individual screens
+//   const { route, room_id, service_id } = remoteMessage.data;
   
-  setTimeout(() => {
-    try {
-      if(room_id){
-        router.replace({
-          pathname: '/chat/conversation',
-          params: {
-            roomId: room_id
-          }
-        });
-      }
-      else if(service_id){
-        router.replace({
-          pathname: '/product-details',
-          params: {
-            id: service_id,
-          }
-        });
-      }
-      else if(route){
-        switch (route) {
-          case 'chat':
-            router.replace('/(tabs)/chat');
-            break;
-          case 'profile':
-            router.replace('/(tabs)/account');
-            break;
-          case 'wallet':
-            router.replace('/(tabs)/wallet');
-            break;
-          case 'explore':
-            router.replace('/(tabs)/explore');
-            break;
-          default:
-            router.replace('/(tabs)/home');
-            break;
-        }
-      }
-      else{
-        router.replace('/home');
-      }
-    } catch (error) {
-      console.error('Navigation error:', error);
-      router.replace('/(tabs)/home');
-    }
-  }, 1500);
-};
+//   setTimeout(() => {
+//     try {
+//       if(room_id){
+//         router.replace({
+//           pathname: '/chat/conversation',
+//           params: {
+//             roomId: room_id
+//           }
+//         });
+//       }
+//       else if(service_id){
+//         router.replace({
+//           pathname: '/product-details',
+//           params: {
+//             id: service_id,
+//           }
+//         });
+//       }
+//       else if(route){
+//         switch (route) {
+//           case 'chat':
+//             router.replace('/(tabs)/chat');
+//             break;
+//           case 'profile':
+//             router.replace('/(tabs)/account');
+//             break;
+//           case 'wallet':
+//             router.replace('/(tabs)/wallet');
+//             break;
+//           case 'explore':
+//             router.replace('/(tabs)/explore');
+//             break;
+//           default:
+//             router.replace('/(tabs)/home');
+//             break;
+//         }
+//       }
+//       else{
+//         router.replace('/home');
+//       }
+//     } catch (error) {
+//       console.error('Navigation error:', error);
+//       router.replace('/(tabs)/home');
+//     }
+//   }, 1500);
+// };
 
 // Background message handler
-messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.log('Background message received:', remoteMessage);
-  // Store for later processing when app opens
-  if (remoteMessage?.data) {
-    await notificationStore.setPendingNavigation(remoteMessage.data);
-  }
-});
+// messaging().setBackgroundMessageHandler(async remoteMessage => {
+//   console.log('Background message received:', remoteMessage);
+//   // Store for later processing when app opens
+//   if (remoteMessage?.data) {
+//     await notificationStore.setPendingNavigation(remoteMessage.data);
+//   }
+// });
 
 export default function RootLayout() {
-  useEffect(() => {
-    console.log('Root layout mounted');
+//   useEffect(() => {
+//     console.log('Root layout mounted');
 
-    // Create notification channel for Android
-    if (Platform.OS === "android") {
-      notifee.createChannel({
-        id: "default",
-        name: "Default Channel",
-        importance: AndroidImportance.HIGH,
-        sound: "default",
-        vibration: true,
-      }).catch(console.error);
-    }
+//     // Create notification channel for Android
+//     if (Platform.OS === "android") {
+//       notifee.createChannel({
+//         id: "default",
+//         name: "Default Channel",
+//         importance: AndroidImportance.HIGH,
+//         sound: "default",
+//         vibration: true,
+//       }).catch(console.error);
+//     }
 
-    // Handle notification opened app from background/quit state
-    messaging()
-      .getInitialNotification()
-      .then(async remoteMessage => {
-        if (remoteMessage) {
-          console.log('App opened from notification (quit state)');
-          await handleNotificationRouting(remoteMessage);
-        }
-      })
-      .catch(error => {
-        console.error('getInitialNotification error:', error);
-      });
+//     // Handle notification opened app from background/quit state
+//     messaging()
+//       .getInitialNotification()
+//       .then(async remoteMessage => {
+//         if (remoteMessage) {
+//           console.log('App opened from notification (quit state)');
+//           await handleNotificationRouting(remoteMessage);
+//         }
+//       })
+//       .catch(error => {
+//         console.error('getInitialNotification error:', error);
+//       });
 
-    // Handle notification opened app from background state
-    const unsubscribeOnNotificationOpenedApp = messaging().onNotificationOpenedApp(async remoteMessage => {
-      console.log('App opened from notification (background state)');
-      await handleNotificationRouting(remoteMessage);
-    });
+//     // Handle notification opened app from background state
+//     const unsubscribeOnNotificationOpenedApp = messaging().onNotificationOpenedApp(async remoteMessage => {
+//       console.log('App opened from notification (background state)');
+//       await handleNotificationRouting(remoteMessage);
+//     });
 
-    // Handle foreground messages (just log, UI feedback handled in tab layout)
-    const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
-      console.log('Foreground message received in root layout');
-      // Store the data in case user wants to navigate later
-      if (remoteMessage?.data) {
-        await notificationStore.setPendingNavigation(remoteMessage.data);
-      }
-    });
+//     // Handle foreground messages (just log, UI feedback handled in tab layout)
+//     const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
+//       console.log('Foreground message received in root layout');
+//       // Store the data in case user wants to navigate later
+//       if (remoteMessage?.data) {
+//         await notificationStore.setPendingNavigation(remoteMessage.data);
+//       }
+//     });
 
-    return () => {
-      unsubscribeOnNotificationOpenedApp();
-      unsubscribeOnMessage();
-    };
-  }, []);
+//     return () => {
+//       unsubscribeOnNotificationOpenedApp(); 
+//       unsubscribeOnMessage();
+//     };
+//   }, []);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
