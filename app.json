@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "SubSpace",
+    "slug": "Subspace",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/subspace.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "android": {
+      "package": "org.grow90.whatsub"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/subspace.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/subspace.png",
+          "sounds": []
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5ca675ad-17c8-4ab1-a454-d8b95f598a40"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "org.grow90.whatsub"
+    }
+  }
+}
