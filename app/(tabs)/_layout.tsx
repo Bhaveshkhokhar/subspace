@@ -617,143 +617,143 @@ import { Tabs } from 'expo-router';
 import { Home, MessageSquare, Wallet, Compass, User } from 'lucide-react-native';
 import { useTranslation } from '@/hooks/useLanguage';
 import { DEFAULT_TAB_BAR_STYLE } from '@/constants/tabBarStyles';
-import messaging from "@react-native-firebase/messaging";
+// import messaging from "@react-native-firebase/messaging";
 import { useToast } from "@/hooks/useToast";
-import { storage } from "@/utils/storage";
+import { storage } from "@/utils/storage"; 
 import {
   Platform,
   PermissionsAndroid,
 } from "react-native";
 
-async function requestUserPermission() {
-  if (Platform.OS === "ios") {
-    const authStatus = await messaging().requestPermission();
-    return (
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL
-    );
-  } else if (Platform.OS === "android" && Platform.Version >= 33) {
-    const result = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-    );
-    return result === PermissionsAndroid.RESULTS.GRANTED;
-  }
-  return true;
-}
+// async function requestUserPermission() {
+//   if (Platform.OS === "ios") {
+//     const authStatus = await messaging().requestPermission();
+//     return (
+//       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+//       authStatus === messaging.AuthorizationStatus.PROVISIONAL
+//     );
+//   } else if (Platform.OS === "android" && Platform.Version >= 33) {
+//     const result = await PermissionsAndroid.request(
+//       PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+//     );
+//     return result === PermissionsAndroid.RESULTS.GRANTED;
+//   }
+//   return true;
+// }
 
-async function registerFCMToken(token: any) {
-  try {
-    const authToken = await storage.getAuthToken();
-    const userId = await storage.getUserId();
+// async function registerFCMToken(token: any) {
+//   try {
+//     const authToken = await storage.getAuthToken();
+//     const userId = await storage.getUserId();
 
-    if (!authToken || !userId) {
-      console.error("Missing auth token or user ID");
-      return false;
-    }
+//     if (!authToken || !userId) {
+//       console.error("Missing auth token or user ID");
+//       return false;
+//     }
 
-    const response = await fetch('https://db.subspace.money/v1/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body: JSON.stringify({
-        query: `
-          mutation MyMutation($user_id: uuid = "", $fcm_token: String = "") {
-            insert_whatsub_fcm_token(
-              objects: {user_id: $user_id, fcm_token: $fcm_token}, 
-              on_conflict: {
-                constraint: whatsub_fcm_token_user_id_fcm_token_key, 
-                update_columns: fcm_token
-              }
-            ) {
-              affected_rows
-            }
-          }
-        `,
-        variables: {
-          user_id: userId,
-          fcm_token: token,
-        }
-      })
-    });
+//     const response = await fetch('https://db.subspace.money/v1/graphql', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${authToken}`
+//       },
+//       body: JSON.stringify({
+//         query: `
+//           mutation MyMutation($user_id: uuid = "", $fcm_token: String = "") {
+//             insert_whatsub_fcm_token(
+//               objects: {user_id: $user_id, fcm_token: $fcm_token}, 
+//               on_conflict: {
+//                 constraint: whatsub_fcm_token_user_id_fcm_token_key, 
+//                 update_columns: fcm_token
+//               }
+//             ) {
+//               affected_rows
+//             }
+//           }
+//         `,
+//         variables: {
+//           user_id: userId,
+//           fcm_token: token,
+//         }
+//       })
+//     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! status: ${response.status}`);
+//     }
 
-    const result = await response.json();
-    console.log("FCM token registered successfully:", result);
-    return true;
+//     const result = await response.json();
+//     console.log("FCM token registered successfully:", result);
+//     return true;
     
-  } catch (error) {
-    console.error('Error registering FCM token:', error);
-    return false;
-  }
-}
+//   } catch (error) {
+//     console.error('Error registering FCM token:', error);
+//     return false;
+//   }
+// }
 
 export default function TabLayout() {
   const { t } = useTranslation();
   const { showSuccess, showError } = useToast();
   
-  useEffect(() => {
-    console.log('Tab layout mounted - setting up notifications');
+  // useEffect(() => {
+  //   console.log('Tab layout mounted - setting up notifications');
     
-    const setupNotificationsAfterLogin = async () => {
-      try {
-        // Request permission (only after login)
-        const granted = await requestUserPermission();
+  //   const setupNotificationsAfterLogin = async () => {
+  //     try {
+  //       // Request permission (only after login)
+  //       const granted = await requestUserPermission();
 
-        if (granted) {
-          showSuccess("Notification Permission Granted ✅");
+  //       if (granted) {
+  //         showSuccess("Notification Permission Granted ✅");
 
-          // Get FCM token and register it
-          const token = await messaging().getToken();
-          console.log("FCM Token:", token);
+  //         // Get FCM token and register it
+  //         const token = await messaging().getToken();
+  //         console.log("FCM Token:", token);
           
-          if (token) {
-            const success = await registerFCMToken(token);
-            if (success) {
-              console.log("FCM token registered with server");
-            }
-          }
-        } else {
-          showError("Notification Permission Denied ❌");
-        }
-      } catch (error) {
-        console.error("Notification setup error:", error);
-        showError("Failed to setup notifications");
-      }
-    };
+  //         if (token) {
+  //           const success = await registerFCMToken(token);
+  //           if (success) {
+  //             console.log("FCM token registered with server");
+  //           }
+  //         }
+  //       } else {
+  //         showError("Notification Permission Denied ❌");
+  //       }
+  //     } catch (error) {
+  //       console.error("Notification setup error:", error);
+  //       showError("Failed to setup notifications");
+  //     }
+  //   };
 
-    // Set up notifications after a small delay to ensure user is fully logged in
-    const timer = setTimeout(setupNotificationsAfterLogin, 1000);
+  //   // Set up notifications after a small delay to ensure user is fully logged in
+  //   const timer = setTimeout(setupNotificationsAfterLogin, 1000);
 
-    // Handle foreground messages with user feedback
-    const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
-      console.log('Foreground message in tab layout:', remoteMessage);
+  //   // Handle foreground messages with user feedback
+  //   const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
+  //     console.log('Foreground message in tab layout:', remoteMessage);
       
-      // Show user-friendly notification
-      if (remoteMessage.notification?.title) {
-        showSuccess(`📱 ${remoteMessage.notification.title}`);
-      }
-    });
+  //     // Show user-friendly notification
+  //     if (remoteMessage.notification?.title) {
+  //       showSuccess(`📱 ${remoteMessage.notification.title}`);
+  //     }
+  //   });
 
     // Token refresh listener (handle token updates after login)
-    const unsubscribeOnTokenRefresh = messaging().onTokenRefresh(async (newToken) => {
-      console.log('FCM token refreshed in tab layout:', newToken);
-      const success = await registerFCMToken(newToken);
-      if (success) {
-        console.log("Refreshed token registered successfully");
-      }
-    });
+  //   const unsubscribeOnTokenRefresh = messaging().onTokenRefresh(async (newToken) => {
+  //     console.log('FCM token refreshed in tab layout:', newToken);
+  //     const success = await registerFCMToken(newToken);
+  //     if (success) {
+  //       console.log("Refreshed token registered successfully");
+  //     }
+  //   });
 
-    return () => {
-      clearTimeout(timer);
-      unsubscribeOnMessage();
-      unsubscribeOnTokenRefresh();
-    };
-  }, []); 
+  //   return () => {
+  //     clearTimeout(timer);
+  //     unsubscribeOnMessage();
+  //     unsubscribeOnTokenRefresh();
+  //   };
+  // }, []); 
 
   return (
     <Tabs
